@@ -8,12 +8,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var lastKeyPressTime: Date?
     var resetTimer: Timer?
 
-    let timeoutInterval: TimeInterval = 2.1
+    let timeoutInterval: TimeInterval = 3
     var statusItem: NSStatusItem!
 
     var currentOverlay: NSWindow?
     
-    var particleWindows: [NSWindow] = []
+    var particleOverlayWindow: NSWindow?
+    var particleOverlayController: NSHostingController<ParticleCanvasView>?
+    let particleManager = ParticleManager()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         registerCustomFont(named: "Ithaca.ttf")
@@ -24,6 +26,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             alert.runModal()
         }
         
+        self.setupParticleOverlay()
+        
         // Setup status bar
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.button?.title = "Combo: 0"
@@ -33,11 +37,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.keyPressed()
         }
         
-//        // Listen for global mouse clicks
-//        NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown) { event in
-//            let screenLoc = NSEvent.mouseLocation
-//            self.spawnParticles(at: screenLoc)
-//        }
+        // Listen for global mouse clicks
+        NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown) { _ in
+            let loc = NSEvent.mouseLocation
+            print("Click at: \(loc)")
+
+            // Flip coordinates
+            if let screen = NSScreen.main {
+                let flippedY = screen.frame.height - loc.y
+                let flippedPoint = CGPoint(x: loc.x, y: flippedY)
+                self.particleManager.spawnConfetti(at: flippedPoint)
+            }
+        }
 
         startResetTimer()
     }
@@ -116,14 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.orderFrontRegardless()
         currentOverlay = window
         
-        // Animate fade-out before closing
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-            withAnimation(.easeOut(duration: 0.3)) {
-                fadeOpacity = 0.0
-            }
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self, weak window] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeoutInterval) { [weak self, weak window] in
             window?.close()
             if self?.currentOverlay == window {
                 self?.currentOverlay = nil
@@ -131,40 +135,39 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    func spawnParticles(at screenPoint: CGPoint) {
-        // Make sure UI updates happen on the main thread
-        DispatchQueue.main.async {
-            // Create SwiftUI particle view
-            let hostingView = NSHostingView(rootView: ParticleCircle())
-            hostingView.frame = NSRect(x: 0, y: 0, width: 20, height: 20) // Adjust as needed
-            hostingView.wantsLayer = true
-            hostingView.layer?.backgroundColor = NSColor.clear.cgColor
+    func setupParticleOverlay() {
+        let screen = NSScreen.main!.frame
+        let window = NSWindow(
+            contentRect: screen,
+            styleMask: .borderless,
+            backing: .buffered,
+            defer: false
+        )
 
-            // Create a transparent window for the particle
-            let window = NSWindow(
-                contentRect: NSRect(x: screenPoint.x - 10, y: screenPoint.y - 10, width: 20, height: 20),
-                styleMask: .borderless,
-                backing: .buffered,
-                defer: false
-            )
+        window.level = .floating
+        window.ignoresMouseEvents = true
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.hasShadow = false
 
-            window.isOpaque = false
-            window.backgroundColor = .clear
-            window.hasShadow = false
-            window.ignoresMouseEvents = true
-            window.level = .floating
-            window.contentView = hostingView
-            window.makeKeyAndOrderFront(nil)
+        // Force compositing transparency
+        window.contentView?.wantsLayer = true
+        window.contentView?.layer?.backgroundColor = NSColor.clear.cgColor
 
-            // Keep strong reference
-            self.particleWindows.append(window)
+        // Add SwiftUI view
+        let hostingView = NSHostingView(rootView: ParticleCanvasView(manager: particleManager))
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        window.contentView = NSView()
+        window.contentView?.addSubview(hostingView)
 
-            // Close and clean up after animation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                window.orderOut(nil)
-                window.close()
-                self.particleWindows.removeAll { $0 == window }
-            }
-        }
+        // Pin SwiftUI view to entire window
+        NSLayoutConstraint.activate([
+            hostingView.leadingAnchor.constraint(equalTo: window.contentView!.leadingAnchor),
+            hostingView.trailingAnchor.constraint(equalTo: window.contentView!.trailingAnchor),
+            hostingView.topAnchor.constraint(equalTo: window.contentView!.topAnchor),
+            hostingView.bottomAnchor.constraint(equalTo: window.contentView!.bottomAnchor),
+        ])
+
+        window.orderFrontRegardless()
     }
 }

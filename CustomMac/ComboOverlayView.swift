@@ -27,16 +27,16 @@ struct ComboOverlayView: View {
 
                         ZStack(alignment: .leading) {
                             // Background bar
-                            RoundedRectangle(cornerRadius: 2)
+                            Rectangle()
                                 .fill(Color.white.opacity(0.2))
                                 .frame(width: barWidth, height: 4)
 
                             // Animated progress fill
-                            RoundedRectangle(cornerRadius: 2)
+                            Rectangle()
                                 .fill(Color.white.opacity(0.8))
                                 .shadow(color: .yellow, radius: 4)
                                 .frame(width: barWidth * progress, height: 4)
-                                .animation(.linear(duration: 1.2), value: progress)
+                                .animation(.linear(duration: 3), value: progress)
                         }
                         .frame(width: barWidth, height: 4)
                         .onAppear {
