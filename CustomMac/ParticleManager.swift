@@ -2,15 +2,19 @@ import Foundation
 import SwiftUI
 
 class ParticleManager: ObservableObject {
-    @Published var particles: [ConfettiParticle] = []
+    @Published var confetti: [ConfettiParticle] = []
+    @Published var sunRays: [SunRay] = []
     
     var timer: Timer?
+    var sunRayTimer: Timer?
 
     init() {
         // Update physics every 1/60th of a second
         timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
-            self.updateParticles()
+            self.updateConfetti()
         }
+        
+        startSunraySpawner()
     }
     
     func spawnConfetti(at point: CGPoint, count: Int = 10) {
@@ -25,14 +29,14 @@ class ParticleManager: ObservableObject {
                 position: point,
                 velocity: CGVector(dx: dx, dy: dy)
             )
-            particles.append(particle)
+            confetti.append(particle)
         }
     }
 
-    func updateParticles() {
+    func updateConfetti() {
         let now = Date()
-        for i in 0..<particles.count {
-            var p = particles[i]
+        for i in 0..<confetti.count {
+            var p = confetti[i]
             let dt = now.timeIntervalSince(p.createdAt)
 
             if dt > p.lifespan {
@@ -47,10 +51,36 @@ class ParticleManager: ObservableObject {
             p.position.x += p.velocity.dx * timeStep
             p.position.y += p.velocity.dy * timeStep
 
-            particles[i] = p
+            confetti[i] = p
         }
 
         // Remove expired
-        particles.removeAll { Date().timeIntervalSince($0.createdAt) > $0.lifespan }
+        confetti.removeAll { Date().timeIntervalSince($0.createdAt) > $0.lifespan }
+    }
+    
+    func spawnSunRay() {
+        let randomAngle = Double.random(in: -80...10) // Narrow sun cone
+        let randomWidth = CGFloat.random(in: 15...200)
+        let lifespan: TimeInterval = 5.0
+        
+        // Spawn new sunray
+        let ray = SunRay(angle: randomAngle, width: randomWidth, lifespan: lifespan)
+        sunRays.append(ray)
+
+        // Auto-remove after lifespan
+        sunRays.removeAll { Date().timeIntervalSince($0.createdAt) > $0.lifespan }
+    }
+
+    func startSunraySpawner() {
+        self.sunRays = []
+        sunRayTimer = Timer.scheduledTimer(withTimeInterval: 0.6, repeats: true) { _ in
+            self.spawnSunRay()
+        }
+    }
+
+    func stopSunraySpawner() {
+        self.sunRays.removeAll()
+        sunRayTimer?.invalidate()
+        sunRayTimer = nil
     }
 }

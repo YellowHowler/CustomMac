@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ComboOverlayView: View {
+struct ComboView: View {
     let combo: Int
     @State private var scale: CGFloat = 1.5
     @Binding var opacity: Double

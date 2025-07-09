@@ -11,11 +11,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let timeoutInterval: TimeInterval = 3
     var statusItem: NSStatusItem!
 
-    var currentOverlay: NSWindow?
+    var comboOverlayWindow: NSWindow?
     
     var particleOverlayWindow: NSWindow?
-    var particleOverlayController: NSHostingController<ParticleCanvasView>?
+    var particleOverlayController: NSHostingController<ConfettiCanvasView>?
     let particleManager = ParticleManager()
+    
+    var screenEffectOverlayWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         registerCustomFont(named: "Ithaca.ttf")
@@ -27,6 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         self.setupParticleOverlay()
+        self.displayScreenEffect()
         
         // Setup status bar
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -89,23 +92,50 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    func configureClearWindow(window: NSWindow, hostingView: NSHostingView<some View>) -> NSWindow {
+        window.isReleasedWhenClosed = false
+        window.level = .floating
+        window.ignoresMouseEvents = true
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.hasShadow = false
+
+        // Force compositing transparency
+        window.contentView = NSView()
+        window.contentView?.wantsLayer = true
+        window.contentView?.layer?.backgroundColor = NSColor.clear.cgColor
+
+        // Attach the SwiftUI view
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        window.contentView?.addSubview(hostingView)
+
+        NSLayoutConstraint.activate([
+            hostingView.leadingAnchor.constraint(equalTo: window.contentView!.leadingAnchor),
+            hostingView.trailingAnchor.constraint(equalTo: window.contentView!.trailingAnchor),
+            hostingView.topAnchor.constraint(equalTo: window.contentView!.topAnchor),
+            hostingView.bottomAnchor.constraint(equalTo: window.contentView!.bottomAnchor),
+        ])
+        
+        return window
+    }
+    
     func showComboOverlay(count: Int) {
-        currentOverlay?.close()
+        comboOverlayWindow?.close()
         
         let screenFrame = NSScreen.main!.visibleFrame
         let windowWidth: CGFloat = 250
         let windowHeight: CGFloat = 80
         
         var fadeOpacity = 1.0
-
+        
+        // Set up combo overlay window
         let hostingView = NSHostingView(
-            rootView: ComboOverlayView(combo: count, opacity: .init(get: {
+            rootView: ComboView(combo: count, opacity: .init(get: {
                 fadeOpacity
             }, set: { newVal in
                 fadeOpacity = newVal
             }))
         )
-
         let window = NSWindow(
             contentRect: NSRect(x: screenFrame.maxX - windowWidth - 10,
                                 y: screenFrame.maxY - windowHeight - 10,
@@ -115,59 +145,44 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-
-        window.isReleasedWhenClosed = false
-        window.level = .floating
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.hasShadow = false
-        window.ignoresMouseEvents = true
-        window.contentView = hostingView
-
-        window.orderFrontRegardless()
-        currentOverlay = window
+        comboOverlayWindow = self.configureClearWindow(window:window, hostingView:hostingView)
+        comboOverlayWindow?.orderFrontRegardless()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + timeoutInterval) { [weak self, weak window] in
             window?.close()
-            if self?.currentOverlay == window {
-                self?.currentOverlay = nil
+            if self?.comboOverlayWindow == window {
+                self?.comboOverlayWindow = nil
             }
         }
     }
     
     func setupParticleOverlay() {
+        // Set up particle overlay window
         let screen = NSScreen.main!.frame
+        let hostingView = NSHostingView(rootView: ConfettiCanvasView(manager: particleManager))
         let window = NSWindow(
             contentRect: screen,
             styleMask: .borderless,
             backing: .buffered,
             defer: false
         )
-
-        window.level = .floating
-        window.ignoresMouseEvents = true
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.hasShadow = false
-
-        // Force compositing transparency
-        window.contentView?.wantsLayer = true
-        window.contentView?.layer?.backgroundColor = NSColor.clear.cgColor
-
-        // Add SwiftUI view
-        let hostingView = NSHostingView(rootView: ParticleCanvasView(manager: particleManager))
-        hostingView.translatesAutoresizingMaskIntoConstraints = false
-        window.contentView = NSView()
-        window.contentView?.addSubview(hostingView)
-
-        // Pin SwiftUI view to entire window
-        NSLayoutConstraint.activate([
-            hostingView.leadingAnchor.constraint(equalTo: window.contentView!.leadingAnchor),
-            hostingView.trailingAnchor.constraint(equalTo: window.contentView!.trailingAnchor),
-            hostingView.topAnchor.constraint(equalTo: window.contentView!.topAnchor),
-            hostingView.bottomAnchor.constraint(equalTo: window.contentView!.bottomAnchor),
-        ])
-
-        window.orderFrontRegardless()
+        particleOverlayWindow = self.configureClearWindow(window:window, hostingView:hostingView)
+        particleOverlayWindow?.orderFrontRegardless()
+    }
+    
+    func displayScreenEffect() {
+        let hour = Calendar.current.component(.hour, from: Date())
+        //guard hour >= 5 && hour < 11 else { return } // Morning only
+        
+        let hostingView = NSHostingView(rootView: SunRayCanvasView(manager: particleManager))
+        let screen = NSScreen.main!.frame
+        let window = NSWindow(
+            contentRect: screen,
+            styleMask: [.borderless],
+            backing: .buffered,
+            defer: false
+        )
+        screenEffectOverlayWindow = self.configureClearWindow(window:window, hostingView:hostingView)
+        screenEffectOverlayWindow?.orderFrontRegardless()
     }
 }

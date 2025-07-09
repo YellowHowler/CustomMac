@@ -11,6 +11,10 @@
 		681A868C2E1D86180003E84B /* ParticleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681A868B2E1D86180003E84B /* ParticleManager.swift */; };
 		681A868E2E1D9C5C0003E84B /* ConfettiParticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681A868D2E1D9C5C0003E84B /* ConfettiParticle.swift */; };
 		681A86902E1D9CFC0003E84B /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681A868F2E1D9CFC0003E84B /* ConfettiView.swift */; };
+		681A86922E1DBB900003E84B /* SunRayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681A86912E1DBB900003E84B /* SunRayView.swift */; };
+		681A86942E1DBBA90003E84B /* SunRayCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681A86932E1DBBA90003E84B /* SunRayCanvasView.swift */; };
+		681A86962E1DE28F0003E84B /* SunRay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681A86952E1DE28F0003E84B /* SunRay.swift */; };
+		681A869A2E1DED0A0003E84B /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 681A86992E1DED0A0003E84B /* Info.plist */; };
 		6896AA182E1CBF190099AE97 /* CustomMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6896AA172E1CBF190099AE97 /* CustomMacApp.swift */; };
 		6896AA1A2E1CBF190099AE97 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6896AA192E1CBF190099AE97 /* ContentView.swift */; };
 		6896AA1C2E1CBF1A0099AE97 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6896AA1B2E1CBF1A0099AE97 /* Assets.xcassets */; };
@@ -19,8 +23,7 @@
 		6896AA342E1CBF1A0099AE97 /* CustomMacUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6896AA332E1CBF1A0099AE97 /* CustomMacUITests.swift */; };
 		6896AA362E1CBF1A0099AE97 /* CustomMacUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6896AA352E1CBF1A0099AE97 /* CustomMacUITestsLaunchTests.swift */; };
 		6896AA432E1CC0630099AE97 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6896AA422E1CC0630099AE97 /* AppDelegate.swift */; };
-		6896AA452E1CC07F0099AE97 /* ComboOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6896AA442E1CC07F0099AE97 /* ComboOverlayView.swift */; };
-		6896AA472E1CC2CD0099AE97 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6896AA462E1CC2CD0099AE97 /* Info.plist */; };
+		6896AA452E1CC07F0099AE97 /* ComboView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6896AA442E1CC07F0099AE97 /* ComboView.swift */; };
 		68DC499B2E1CCE5B00FF20A2 /* Ithaca.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 68DC499A2E1CCE5B00FF20A2 /* Ithaca.ttf */; };
 /* End PBXBuildFile section */
 
@@ -46,6 +49,10 @@
 		681A868B2E1D86180003E84B /* ParticleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleManager.swift; sourceTree = "<group>"; };
 		681A868D2E1D9C5C0003E84B /* ConfettiParticle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiParticle.swift; sourceTree = "<group>"; };
 		681A868F2E1D9CFC0003E84B /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
+		681A86912E1DBB900003E84B /* SunRayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunRayView.swift; sourceTree = "<group>"; };
+		681A86932E1DBBA90003E84B /* SunRayCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunRayCanvasView.swift; sourceTree = "<group>"; };
+		681A86952E1DE28F0003E84B /* SunRay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunRay.swift; sourceTree = "<group>"; };
+		681A86992E1DED0A0003E84B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6896AA142E1CBF190099AE97 /* CustomMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CustomMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6896AA172E1CBF190099AE97 /* CustomMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomMacApp.swift; sourceTree = "<group>"; };
 		6896AA192E1CBF190099AE97 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -58,8 +65,7 @@
 		6896AA332E1CBF1A0099AE97 /* CustomMacUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomMacUITests.swift; sourceTree = "<group>"; };
 		6896AA352E1CBF1A0099AE97 /* CustomMacUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomMacUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		6896AA422E1CC0630099AE97 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		6896AA442E1CC07F0099AE97 /* ComboOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComboOverlayView.swift; sourceTree = "<group>"; };
-		6896AA462E1CC2CD0099AE97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6896AA442E1CC07F0099AE97 /* ComboView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComboView.swift; sourceTree = "<group>"; };
 		68DC499A2E1CCE5B00FF20A2 /* Ithaca.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ithaca.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +94,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		681A86972E1DE2A10003E84B /* Confetti */ = {
+			isa = PBXGroup;
+			children = (
+				681A868D2E1D9C5C0003E84B /* ConfettiParticle.swift */,
+				681A868F2E1D9CFC0003E84B /* ConfettiView.swift */,
+				681A86892E1D82010003E84B /* ParticleCanvasView.swift */,
+			);
+			path = Confetti;
+			sourceTree = "<group>";
+		};
+		681A86982E1DE2C00003E84B /* ScreenEffect */ = {
+			isa = PBXGroup;
+			children = (
+				681A86952E1DE28F0003E84B /* SunRay.swift */,
+				681A86912E1DBB900003E84B /* SunRayView.swift */,
+				681A86932E1DBBA90003E84B /* SunRayCanvasView.swift */,
+			);
+			path = ScreenEffect;
+			sourceTree = "<group>";
+		};
 		6896AA0B2E1CBF190099AE97 = {
 			isa = PBXGroup;
 			children = (
@@ -112,18 +138,17 @@
 			isa = PBXGroup;
 			children = (
 				68DC499A2E1CCE5B00FF20A2 /* Ithaca.ttf */,
-				6896AA462E1CC2CD0099AE97 /* Info.plist */,
+				6896AA422E1CC0630099AE97 /* AppDelegate.swift */,
+				681A86982E1DE2C00003E84B /* ScreenEffect */,
+				681A86972E1DE2A10003E84B /* Confetti */,
+				681A868B2E1D86180003E84B /* ParticleManager.swift */,
 				6896AA172E1CBF190099AE97 /* CustomMacApp.swift */,
 				6896AA192E1CBF190099AE97 /* ContentView.swift */,
-				6896AA422E1CC0630099AE97 /* AppDelegate.swift */,
-				6896AA442E1CC07F0099AE97 /* ComboOverlayView.swift */,
-				681A868D2E1D9C5C0003E84B /* ConfettiParticle.swift */,
-				681A868F2E1D9CFC0003E84B /* ConfettiView.swift */,
-				681A86892E1D82010003E84B /* ParticleCanvasView.swift */,
-				681A868B2E1D86180003E84B /* ParticleManager.swift */,
+				6896AA442E1CC07F0099AE97 /* ComboView.swift */,
 				6896AA1B2E1CBF1A0099AE97 /* Assets.xcassets */,
 				6896AA202E1CBF1A0099AE97 /* CustomMac.entitlements */,
 				6896AA1D2E1CBF1A0099AE97 /* Preview Content */,
+				681A86992E1DED0A0003E84B /* Info.plist */,
 			);
 			path = CustomMac;
 			sourceTree = "<group>";
@@ -259,8 +284,8 @@
 			files = (
 				68DC499B2E1CCE5B00FF20A2 /* Ithaca.ttf in Resources */,
 				6896AA1F2E1CBF1A0099AE97 /* Preview Assets.xcassets in Resources */,
+				681A869A2E1DED0A0003E84B /* Info.plist in Resources */,
 				6896AA1C2E1CBF1A0099AE97 /* Assets.xcassets in Resources */,
-				6896AA472E1CC2CD0099AE97 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,10 +313,13 @@
 				6896AA432E1CC0630099AE97 /* AppDelegate.swift in Sources */,
 				681A868E2E1D9C5C0003E84B /* ConfettiParticle.swift in Sources */,
 				6896AA1A2E1CBF190099AE97 /* ContentView.swift in Sources */,
-				6896AA452E1CC07F0099AE97 /* ComboOverlayView.swift in Sources */,
+				681A86962E1DE28F0003E84B /* SunRay.swift in Sources */,
+				681A86922E1DBB900003E84B /* SunRayView.swift in Sources */,
+				6896AA452E1CC07F0099AE97 /* ComboView.swift in Sources */,
 				681A868A2E1D82010003E84B /* ParticleCanvasView.swift in Sources */,
 				681A86902E1D9CFC0003E84B /* ConfettiView.swift in Sources */,
 				681A868C2E1D86180003E84B /* ParticleManager.swift in Sources */,
+				681A86942E1DBBA90003E84B /* SunRayCanvasView.swift in Sources */,
 				6896AA182E1CBF190099AE97 /* CustomMacApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -381,7 +409,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				"INFOPLIST_FILE[sdk=*]" = CustomMac/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -439,7 +467,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				"INFOPLIST_FILE[sdk=*]" = CustomMac/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
