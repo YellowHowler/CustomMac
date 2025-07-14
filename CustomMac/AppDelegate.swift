@@ -4,12 +4,15 @@ import AppKit
 import CoreText
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    var statusItem: NSStatusItem!
+    var settingsWindow: NSWindow?
+    let appState = AppState()
+    
     var comboCounter: Int = 0
     var lastKeyPressTime: Date?
     var resetTimer: Timer?
 
     let timeoutInterval: TimeInterval = 3
-    var statusItem: NSStatusItem!
 
     var comboOverlayWindow: NSWindow?
     
@@ -18,22 +21,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let particleManager = ParticleManager()
     
     var screenEffectOverlayWindow: NSWindow?
+    
+    var audioBarOverlayWindow: NSWindow?
+    let audioManager = AudioManager()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         registerCustomFont(named: "Ithaca.ttf")
+        requestAccessibilityPermission()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            let alert = NSAlert()
-            alert.messageText = "Custom Mac launched!"
-            alert.runModal()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//            let alert = NSAlert()
+//            alert.messageText = "Custom Mac launched!" 
+//            alert.runModal()
+//        }
+        
+        // Menu bar icon
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem.button {
+            button.image = NSImage(systemSymbolName: "waveform", accessibilityDescription: nil)
+            button.action = #selector(toggleSettingsWindow(_:))
         }
         
         self.setupParticleOverlay()
         self.displayScreenEffect()
-        
-        // Setup status bar
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.title = "Combo: 0"
+        self.displayAudioBar()
+    
 
         // Listen for global key presses
         NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
@@ -43,7 +55,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Listen for global mouse clicks
         NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown) { _ in
             let loc = NSEvent.mouseLocation
-            print("Click at: \(loc)")
 
             // Flip coordinates
             if let screen = NSScreen.main {
@@ -54,6 +65,67 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         startResetTimer()
+    }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        toggleSettingsWindow(nil)
+        return true
+    }
+    
+    @objc func toggleSettingsWindow(_ sender: AnyObject?) {
+        if let window = settingsWindow {
+            window.level = .floating
+            NSApp.activate(ignoringOtherApps: true)
+            window.makeKeyAndOrderFront(nil)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                window.level = .normal
+            }
+            return
+        }
+
+        let settingsView = SettingsView()
+            .environmentObject(audioManager)
+
+        let hostingController = NSHostingController(rootView: settingsView)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 300, height: 150),
+            styleMask: [.titled, .closable, .resizable, .miniaturizable],
+            backing: .buffered,
+            defer: false
+        )
+
+        window.center()
+        window.title = "Settings"
+        window.contentViewController = hostingController
+        window.isReleasedWhenClosed = false  // important to prevent deallocation crash
+        window.makeKeyAndOrderFront(nil)
+
+        self.settingsWindow = window
+
+        // Remove reference on close
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: window,
+            queue: .main
+        ) { [weak self] notification in
+            if let obj = notification.object as? NSWindow, obj == self?.settingsWindow {
+                self?.settingsWindow = nil
+            }
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+
+        // Revert back to normal window level after short delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            window.level = .normal
+        }
+    }
+    
+    func requestAccessibilityPermission() {
+        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+        let accessEnabled = AXIsProcessTrustedWithOptions(options)
+        print("Accessibility access: \(accessEnabled)")
     }
     
     func registerCustomFont(named fontName: String) {
@@ -76,10 +148,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func keyPressed() {
         comboCounter += 1
-        statusItem.button?.title = "Combo: \(comboCounter)"
         lastKeyPressTime = Date()
 
-        showComboOverlay(count: comboCounter)
+        displayComboOverlay(count: comboCounter)
 
         resetTimer?.invalidate()
         startResetTimer()
@@ -88,7 +159,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func startResetTimer() {
         resetTimer = Timer.scheduledTimer(withTimeInterval: timeoutInterval, repeats: false) { _ in
             self.comboCounter = 0
-            self.statusItem.button?.title = "Combo: 0"
         }
     }
     
@@ -119,7 +189,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return window
     }
     
-    func showComboOverlay(count: Int) {
+    func displayComboOverlay(count: Int) {
         comboOverlayWindow?.close()
         
         let screenFrame = NSScreen.main!.visibleFrame
@@ -184,5 +254,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
         screenEffectOverlayWindow = self.configureClearWindow(window:window, hostingView:hostingView)
         screenEffectOverlayWindow?.orderFrontRegardless()
+    }
+    
+    func displayAudioBar() {
+        let screenFrame = NSScreen.main!.visibleFrame
+        let windowWidth: CGFloat = 220
+        let windowHeight: CGFloat = 80
+
+        let origin = CGPoint(x: screenFrame.minX + 10,
+                             y: screenFrame.maxY - windowHeight - 10)
+
+        let hostingView = NSHostingView(rootView: AudioBarView(audioManager: audioManager))
+
+        let window = NSWindow(
+            contentRect: NSRect(origin: origin, size: CGSize(width: windowWidth, height: windowHeight)),
+            styleMask: [.borderless],
+            backing: .buffered,
+            defer: false
+        )
+        
+        audioBarOverlayWindow = self.configureClearWindow(window: window, hostingView: hostingView)
+        audioBarOverlayWindow?.orderFrontRegardless()
     }
 }

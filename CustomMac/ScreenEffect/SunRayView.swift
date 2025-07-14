@@ -2,36 +2,32 @@ import SwiftUI
 
 struct SunRayView: View {
     let ray: SunRay
-    @State private var opacity: Double = 0.0
+    @State private var time: TimeInterval = 0
 
     var body: some View {
-        Rectangle()
-        .fill(Color.yellow.opacity(0.08))
-        .frame(width: ray.width, height: 6000)
-        .mask(
-            LinearGradient(
-                gradient: Gradient(stops: [
-                    .init(color: .yellow, location: 0.0),
-                    .init(color: .clear, location: 1.0)
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-        .blendMode(.plusLighter)
-        .blur(radius: /*@START_MENU_TOKEN@*/3.0/*@END_MENU_TOKEN@*/)
-        .rotationEffect(.degrees(ray.angle), anchor: .topLeading)
-        .offset(x: -1000, y: -20) // small nudge to reach from offscreen
-        .opacity(opacity)
-        .onAppear {
-            withAnimation(.easeInOut(duration: ray.lifespan * 0.3)) {
-                opacity = 1.0
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + ray.lifespan * 0.7) {
-                withAnimation(.easeOut(duration: ray.lifespan * 0.3)) {
-                    opacity = 0.0
-                }
-            }
+        TimelineView(.animation) { context in
+            let elapsed = context.date.timeIntervalSince(ray.createdAt)
+            let progress = elapsed / ray.lifespan
+
+            let visible = progress < 1.0
+            let fadeIn = min(progress / 0.3, 1.0)
+            let fadeOut = max(0.0, min((1.0 - progress) / 0.3, 1.0))
+            let opacity = visible ? fadeIn * fadeOut : 0.0
+
+            Rectangle()
+                .fill(Color.yellow.opacity(0.07))
+                .frame(width: ray.width, height: 1000) // Reduced from 6000 to improve performance
+                .mask(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.yellow, .clear]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .blendMode(.plusLighter)
+                .rotationEffect(.degrees(ray.angle), anchor: .topLeading)
+                .offset(x: -800, y: -150)
+                .opacity(opacity)
         }
     }
 }
